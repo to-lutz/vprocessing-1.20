@@ -1,0 +1,23 @@
+PROCESSER:
+  # The Name of the processer - Only required for plugin to read file!
+  processer_1:
+    # Required Items of the Processer
+    required_items:
+      # Item 1 - Can be copied to create multiple Items
+      item_1:
+        # Display Name of the Item - Can have colors!
+          Display_Name:
+        # Item ID of the Item!
+          ID:
+        # Amount
+          AMOUNT:
+    # Items you get for processing
+    processed_items:
+      # First item you get
+      item_1:
+        # Display Name of the Item - Can have colors!
+          Display_Name:
+        # Item ID of the Item!
+          ID:
+        # Amount
+          AMOUNT:
