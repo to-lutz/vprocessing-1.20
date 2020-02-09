@@ -3,6 +3,7 @@ main: de.verdox.vprocessing.VProcessing
 version: 1.0.0
 api-version: "1.15"
 author: Verdox
+softdepend: [HolographicDisplays]
 commands:
   vproc:
     permission: vproc.admin

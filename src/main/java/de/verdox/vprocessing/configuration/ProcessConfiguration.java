@@ -1,7 +1,12 @@
 package de.verdox.vprocessing.configuration;
 
+import com.gmail.filoghost.holographicdisplays.api.Hologram;
+import com.gmail.filoghost.holographicdisplays.api.HologramsAPI;
+import de.verdox.vprocessing.VProcessing;
+import de.verdox.vprocessing.configuration.messages.SuccessMessage;
 import de.verdox.vprocessing.model.Processer;
 import de.verdox.vprocessing.utils.Serializer;
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
@@ -18,10 +23,12 @@ public class ProcessConfiguration extends Configuration{
 
     public Map<String,Processer> processerCache;
     public Map<Location, Processer> locationCache;
+    public Map<Processer,Hologram> hologramCache;
 
     public ProcessConfiguration(Plugin plugin,String fileName, String pluginDirectory){
         super(plugin,fileName,pluginDirectory);
         locationCache = new HashMap<>();
+        hologramCache = new HashMap<>();
         initProcesserCache();
     }
 
@@ -31,14 +38,57 @@ public class ProcessConfiguration extends Configuration{
         return processerCache.containsKey(processerID);
     }
 
+    private boolean createHologram(Processer processer){
+        if(processer == null)
+            return false;
+        if(!VProcessing.settings.useHolograms())
+            return false;
+        if(!processer.isUseHologram())
+            return false;
+        if(processer.getLocation() == null)
+            return false;
+        if(hologramCache.containsKey(processer) && !hologramCache.get(processer).isDeleted()){
+            hologramCache.get(processer).delete();
+        }
+        Location loc = processer.getLocation();
+        Hologram hologram = HologramsAPI.createHologram(VProcessing.plugin,loc);
+        hologram.appendTextLine(ChatColor.translateAlternateColorCodes('&',processer.getName()));
+        hologram.appendTextLine("");
+        hologram.appendTextLine(SuccessMessage.Holograms_Duration.getMessage()+processer.getDurationString());
+        hologram.appendTextLine(SuccessMessage.Holograms_NeededItems.getMessage());
+        float lines = 4;
+        if(processer.isUseLargeHologram()){
+            for(ItemStack s:processer.getRequiredItems()){
+                hologram.appendTextLine(ChatColor.translateAlternateColorCodes('&',s.getItemMeta().getDisplayName()+" &8["+"&e"+s.getAmount()+"&8]"));
+                hologram.appendItemLine(s);
+                lines+=2;
+            }
+            hologram.appendTextLine(SuccessMessage.Holograms_ProcessedItems.getMessage());
+            lines++;
+            for(ItemStack s:processer.getOutputItems()){
+                hologram.appendTextLine(ChatColor.translateAlternateColorCodes('&',s.getItemMeta().getDisplayName()+" &8["+"&e"+s.getAmount()+"&8]"));
+                hologram.appendItemLine(s);
+                lines+=2;
+            }
+        }
+        int newY = (int) lines/2;
+        Location fixedLoc = new Location(loc.getWorld(),loc.getX()+0.5,loc.getY()+newY+0.5,loc.getZ()+0.5);
+        hologram.teleport(fixedLoc);
+        hologramCache.put(processer,hologram);
+        return true;
+    }
+
     public boolean changeLocation (String processerID, Location loc){
         if(processerID == null)
+            return false;
+        if(loc == null)
             return false;
         if(!processerCache.containsKey(processerID))
             return false;
         if(locationCache.containsKey(loc))
             return false;
-        Location oldLoc = processerCache.get(processerID).getLocation();
+        Processer processer = processerCache.get(processerID);
+        Location oldLoc = processer.getLocation();
         // Remove from Locationcache
         if(oldLoc!=null)
             locationCache.remove(oldLoc);
@@ -47,6 +97,8 @@ public class ProcessConfiguration extends Configuration{
             return false;
         processerCache.get(processerID).setLocation(loc);
         locationCache.put(loc,processerCache.get(processerID));
+        changeLocation(processerID,loc);
+        createHologram(processer);
         return true;
     }
 
@@ -60,6 +112,7 @@ public class ProcessConfiguration extends Configuration{
                     if(processerCache.containsKey(processer.getLocation()))
                         throw new IllegalStateException("Processer need unique locations! They can't share the same location");
                     locationCache.put(processer.getLocation(),processer);
+                    createHologram(processer);
                 }
             }
         }
@@ -71,6 +124,8 @@ public class ProcessConfiguration extends Configuration{
             config.options().header("Config to setup processers, amounts etc...");
             config.addDefault(configSections.PROCESSER+".processer_1."+configSections.PROCESSER_NAME,"&aMühle");
             config.addDefault(configSections.PROCESSER+".processer_1."+configSections.DURATION,60);
+            config.addDefault(configSections.PROCESSER+".processer_1."+configSections.USE_HOLOGRAM,true);
+            config.addDefault(configSections.PROCESSER+".processer_1."+configSections.USE_LARGE_HOLOGRAM,true);
             config.addDefault(configSections.PROCESSER+".processer_1."+configSections.required_items+".item_1."+configSections.DISPLAY_NAME,"&7Mehl");
             config.addDefault(configSections.PROCESSER+".processer_1."+configSections.required_items+".item_1."+configSections.ID,"BONE_MEAL");
             config.addDefault(configSections.PROCESSER+".processer_1."+configSections.required_items+".item_1."+configSections.AMOUNT,20);
@@ -89,6 +144,7 @@ public class ProcessConfiguration extends Configuration{
         if(!exist(processerID))
             return false;
         config.set(configSections.PROCESSER.name()+"."+processerID+"."+configSections.LOCATION,Serializer.serializeLocation(loc));
+        save();
         return true;
     }
 
@@ -108,6 +164,9 @@ public class ProcessConfiguration extends Configuration{
         List<ItemStack> requiredItems = new ArrayList<>();
         List<ItemStack> processedItems = new ArrayList<>();
 
+        boolean useHologram = false;
+        boolean useLargeHologram = false;
+
         for(String key:config.getConfigurationSection(section.getCurrentPath()+"."+configSections.required_items).getKeys(false)){
             ConfigurationSection item = config.getConfigurationSection(section.getCurrentPath()+"."+configSections.required_items+"."+key);
             String displayName = config.getString(item.getCurrentPath()+"."+configSections.DISPLAY_NAME);
@@ -122,10 +181,12 @@ public class ProcessConfiguration extends Configuration{
         }
 
         for(String key:config.getConfigurationSection(section.getCurrentPath()+"."+configSections.processed_items).getKeys(false)){
-            ConfigurationSection item = config.getConfigurationSection(section.getCurrentPath()+"."+configSections.required_items+"."+key);
+            ConfigurationSection item = config.getConfigurationSection(section.getCurrentPath()+"."+configSections.processed_items+"."+key);
             String displayName = config.getString(item.getCurrentPath()+"."+configSections.DISPLAY_NAME);
             String ID = config.getString(item.getCurrentPath()+"."+configSections.ID);
             int amount = config.getInt(item.getCurrentPath()+"."+configSections.AMOUNT);
+            useHologram = config.getBoolean(configSections.PROCESSER+".processer_1."+configSections.USE_HOLOGRAM);
+            useLargeHologram = config.getBoolean(configSections.PROCESSER+".processer_1."+configSections.USE_LARGE_HOLOGRAM);
 
             ItemStack stack = new ItemStack(Material.getMaterial(ID),amount);
             ItemMeta meta = stack.getItemMeta();
@@ -133,7 +194,7 @@ public class ProcessConfiguration extends Configuration{
             stack.setItemMeta(meta);
             processedItems.add(stack);
         }
-        return new Processer(processerID,name,duration,loc,requiredItems,processedItems);
+        return new Processer(processerID,name,duration,loc,requiredItems,processedItems,useHologram,useLargeHologram);
     }
 
     enum configSections{
@@ -146,5 +207,7 @@ public class ProcessConfiguration extends Configuration{
         DURATION,
         PROCESSER_NAME,
         LOCATION,
+        USE_HOLOGRAM,
+        USE_LARGE_HOLOGRAM,
     }
 }

@@ -1,9 +1,9 @@
 package de.verdox.vprocessing.model;
 
+import de.verdox.vprocessing.utils.SecondsConverter;
 import de.verdox.vprocessing.utils.Serializer;
 import org.bukkit.Location;
 import org.bukkit.inventory.ItemStack;
-
 import java.util.List;
 
 public class Processer {
@@ -14,14 +14,18 @@ public class Processer {
     private String name;
     private int duration;
     private final String processerID;
+    private boolean useHologram;
+    private boolean useLargeHologram;
 
-    public Processer(String processerID,String name,int duration,Location loc, List<ItemStack> rI, List<ItemStack> oI){
+    public Processer(String processerID,String name,int duration,Location loc, List<ItemStack> rI, List<ItemStack> oI, boolean useHologram, boolean useLargeHologram){
         this.processerID = processerID;
         this.name = name;
         this.duration = duration;
         this.location = loc;
         this.requiredItems = rI;
         this.outputItems = oI;
+        this.useHologram = useHologram;
+        this.useLargeHologram = useLargeHologram;
     }
 
     public int getDuration() {
@@ -64,6 +68,10 @@ public class Processer {
 
     public String getProcesserID() {return processerID;}
 
+    public String getDurationString(){
+        return SecondsConverter.convertSeconds(getDuration());
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -86,5 +94,13 @@ public class Processer {
         if(!(obj instanceof Processer)){return false;}
         Processer other = (Processer) obj;
         return other.processerID.equals(this.processerID);
+    }
+
+    public boolean isUseHologram() {
+        return useHologram;
+    }
+
+    public boolean isUseLargeHologram() {
+        return useLargeHologram;
     }
 }

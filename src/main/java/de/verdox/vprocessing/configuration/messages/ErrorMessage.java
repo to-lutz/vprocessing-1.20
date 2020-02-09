@@ -7,6 +7,7 @@ public enum ErrorMessage {
     No_Processer("Processer does not exist!"),
     Not_Enough_Items("&cYou don't have the required Items!"),
     Already_Processing("&cYou are already processing here!"),
+    Not_Enough_InvSpace("&cYou don't have enough space in your inventory!")
     ;
 
     private String message;
