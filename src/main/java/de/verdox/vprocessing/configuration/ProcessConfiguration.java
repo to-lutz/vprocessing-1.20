@@ -55,9 +55,9 @@ public class ProcessConfiguration extends Configuration{
         hologram.appendTextLine(ChatColor.translateAlternateColorCodes('&',processer.getName()));
         hologram.appendTextLine("");
         hologram.appendTextLine(SuccessMessage.Holograms_Duration.getMessage()+processer.getDurationString());
-        hologram.appendTextLine(SuccessMessage.Holograms_NeededItems.getMessage());
         float lines = 4;
         if(processer.isUseLargeHologram()){
+            hologram.appendTextLine(SuccessMessage.Holograms_NeededItems.getMessage());
             for(ItemStack s:processer.getRequiredItems()){
                 hologram.appendTextLine(ChatColor.translateAlternateColorCodes('&',s.getItemMeta().getDisplayName()+" &8["+"&e"+s.getAmount()+"&8]"));
                 hologram.appendItemLine(s);
@@ -185,8 +185,8 @@ public class ProcessConfiguration extends Configuration{
             String displayName = config.getString(item.getCurrentPath()+"."+configSections.DISPLAY_NAME);
             String ID = config.getString(item.getCurrentPath()+"."+configSections.ID);
             int amount = config.getInt(item.getCurrentPath()+"."+configSections.AMOUNT);
-            useHologram = config.getBoolean(configSections.PROCESSER+".processer_1."+configSections.USE_HOLOGRAM);
-            useLargeHologram = config.getBoolean(configSections.PROCESSER+".processer_1."+configSections.USE_LARGE_HOLOGRAM);
+            useHologram = config.getBoolean(configSections.PROCESSER+"."+processerID+"."+configSections.USE_HOLOGRAM);
+            useLargeHologram = config.getBoolean(configSections.PROCESSER+"."+processerID+"."+configSections.USE_LARGE_HOLOGRAM);
 
             ItemStack stack = new ItemStack(Material.getMaterial(ID),amount);
             ItemMeta meta = stack.getItemMeta();

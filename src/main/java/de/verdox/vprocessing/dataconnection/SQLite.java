@@ -5,35 +5,40 @@ import de.verdox.vprocessing.configuration.messages.SuccessMessage;
 import de.verdox.vprocessing.model.ProcessTask;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 
+import java.io.File;
+import java.io.IOException;
 import java.sql.*;
 import java.util.UUID;
 
-public class MySQL extends DataConnectionImpl{
-    private Connection connection;
-    private String host,database,username,password;
-    private int port;
+public class SQLite extends DataConnectionImpl{
 
-    public MySQL(String host, int port, String database, String username, String password){
-        this.host = host;
-        this.port = port;
-        this.database = database;
-        this.username = username;
-        this.password = password;
+    private Plugin plugin;
+    private File file;
+    private Connection connection;
+
+    public SQLite(Plugin plugin,String databaseName,String pluginDirectory){
+        this.plugin = plugin;
+        this.file = new File("plugins/"+pluginDirectory,databaseName+".db");
+        try {
+            file.createNewFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
-    public synchronized void connect() throws SQLException, ClassNotFoundException {
+    public synchronized void connect() throws SQLException {
         if(connection!=null && !connection.isClosed()){
             return;
         }
-
-        Class.forName("com.mysql.jdbc.Driver");
-        connection = DriverManager.getConnection("jdbc:mysql://" + this.host+ ":" + this.port + "/" + this.database, this.username, this.password);
-        System.out.println("MySQL Connection established");
+        connection = DriverManager.getConnection("jdbc:sqlite:"+String.valueOf(file.toURI()));
         initTables();
+        System.out.println("SQLite Connection established!");
     }
 
-    public synchronized boolean disconnect() throws SQLException {
+    @Override
+    public boolean disconnect() throws SQLException {
         if(connection==null ||connection.isClosed()){
             return false;
         }
@@ -41,21 +46,22 @@ public class MySQL extends DataConnectionImpl{
         return true;
     }
 
+    @Override
     protected void initTables() throws SQLException {
-        Statement statement = connection.createStatement();
-        statement.execute("CREATE TABLE IF NOT EXISTS `process_task` (" +
-                "  `id` int(11) unsigned NOT NULL AUTO_INCREMENT," +
-                "  `processerID` varchar(64) NOT NULL DEFAULT ''," +
-                "  `player_uuid` varchar(64) NOT NULL DEFAULT ''," +
-                "  `taskStarted` BIGINT(64) NOT NULL DEFAULT '0'," +
-                "  `taskEnd` BIGINT(64) NOT NULL DEFAULT '0'," +
-                "  PRIMARY KEY (`id`)\n" +
-                ") ");
+        connection.createStatement().execute("CREATE TABLE IF NOT EXISTS process_task (\n"
+        + "id integer PRIMARY KEY, \n"
+        + "processerID text NOT NULL, \n"
+        + "player_uuid text NOT NULL, \n"
+        + "taskStarted integer, \n"
+        + "taskEnd integer"
+                +");");
         System.out.println("Tables loaded");
     }
 
+    @Override
     public void createTask(ProcessTask task) throws SQLException {
-        PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO process_task (player_uuid,processerID,taskStarted,taskEnd) VALUES (?,?,?,?)",Statement.RETURN_GENERATED_KEYS);
+        PreparedStatement preparedStatement = connection.prepareStatement
+                ("INSERT INTO process_task (player_uuid,processerID,taskStarted,taskEnd) VALUES (?,?,?,?)");
         // Player_UUID
         preparedStatement.setString(1,task.getUuid().toString());
         // ProcesserID
@@ -67,10 +73,11 @@ public class MySQL extends DataConnectionImpl{
         preparedStatement.executeUpdate();
     }
 
-    public void getTasksOfPlayer(Player p){
+    @Override
+    public void getTasksOfPlayer(Player p) {
         DataConnectionImpl.runAsync(() -> {
             try {
-                ResultSet result = connection.createStatement().executeQuery("SELECT * FROM process_task WHERE player_uuid = '"+p.getUniqueId().toString()+"'");
+                ResultSet result = connection.createStatement().executeQuery("SELECT * FROM process_task WHERE player_uuid = '"+p.getUniqueId().toString()+"' ;");
                 while(result.next()){
                     String processerID = result.getString("processerID");
                     Long taskStarted = result.getLong("taskStarted");
@@ -83,12 +90,15 @@ public class MySQL extends DataConnectionImpl{
                 Bukkit.getScheduler().runTask(VProcessing.plugin, () -> {
                     p.sendMessage(SuccessMessage.Successfully_loaded_files.getMessage());
                 });
-            } catch (SQLException e) {e.printStackTrace();}
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }, VProcessing.plugin);
     }
 
+    @Override
     public void removeTask(UUID uuid, String processerID) throws SQLException {
-        PreparedStatement preparedStatement = connection.prepareStatement("DELETE FROM process_task WHERE player_uuid = ? AND processerID = ?",Statement.RETURN_GENERATED_KEYS);
+        PreparedStatement preparedStatement = connection.prepareStatement("DELETE FROM process_task WHERE player_uuid = ? AND processerID = ? ;",Statement.RETURN_GENERATED_KEYS);
         // Player_UUID
         preparedStatement.setString(1,uuid.toString());
         // ProcesserID

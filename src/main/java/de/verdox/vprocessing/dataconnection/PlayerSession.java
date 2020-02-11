@@ -15,7 +15,7 @@ public class PlayerSession {
         PlayerSession s = new PlayerSession(p);
         cache.add(s);
         System.out.println("Created PlayerSession for: "+p.getDisplayName());
-        VProcessing.mySQL.getTasksOfPlayer(p);
+        VProcessing.dataConnection.getTasksOfPlayer(p);
         return s;
     }
     public static synchronized PlayerSession getSession(Player p){
@@ -48,7 +48,7 @@ public class PlayerSession {
         if(hasPlayerTask(processer))
             return;
         activeTasks.add(task);
-        VProcessing.mySQL.createTask(task);
+        VProcessing.dataConnection.createTask(task);
     }
 
     public void addTask(ProcessTask task){
@@ -70,7 +70,7 @@ public class PlayerSession {
     public boolean removeTask(Processer processer) throws SQLException {
         if(!hasPlayerTask(processer))
             return false;
-        VProcessing.mySQL.removeTask(playerUUID,processer.getProcesserID());
+        VProcessing.dataConnection.removeTask(playerUUID,processer.getProcesserID());
         ProcessTask task = activeTasks.stream().filter(t -> t.getProcesserID().equals(processer.getProcesserID())).findAny().get();
         activeTasks.remove(task);
         return true;

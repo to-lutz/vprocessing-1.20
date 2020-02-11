@@ -5,8 +5,10 @@ import de.verdox.vprocessing.configuration.Messages;
 import de.verdox.vprocessing.configuration.MySQLConfig;
 import de.verdox.vprocessing.configuration.ProcessConfiguration;
 import de.verdox.vprocessing.configuration.Settings;
+import de.verdox.vprocessing.dataconnection.DataConnectionImpl;
 import de.verdox.vprocessing.dataconnection.MySQL;
 import de.verdox.vprocessing.dataconnection.PlayerSession;
+import de.verdox.vprocessing.dataconnection.SQLite;
 import de.verdox.vprocessing.listener.Listeners;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
@@ -20,8 +22,8 @@ public class VProcessing extends JavaPlugin {
     public static ProcessConfiguration processConfiguration;
     public static Messages messages;
     public static MySQLConfig mySQLConfig;
-    public static MySQL mySQL;
     public static Settings settings;
+    public static DataConnectionImpl dataConnection;
 
     @Override
     public void onEnable() {
@@ -31,9 +33,21 @@ public class VProcessing extends JavaPlugin {
         messages = new Messages(this,"messages.yml","V-Processing");
         processConfiguration = new ProcessConfiguration(this,"processer.yml","V-Processing");
         mySQLConfig = new MySQLConfig(this,"MySQL.yml","V-Processing");
-        mySQL = new MySQL(mySQLConfig.getHost(),mySQLConfig.getPort(),mySQLConfig.getDatabase(),mySQLConfig.getUsername(),mySQLConfig.getPassword());
+        if(settings.useMySQL()){
+            dataConnection = new MySQL(mySQLConfig.getHost(),mySQLConfig.getPort(),mySQLConfig.getDatabase(),mySQLConfig.getUsername(),mySQLConfig.getPassword());
+        }
+        else {
+            dataConnection = new SQLite(this,"v-Processing","V-processing");
+        }
+        connectDatabase();
+        setupCommands();
+        setupEventListener();
+        Bukkit.getOnlinePlayers().stream().forEach(player -> PlayerSession.getSession(player));
+        checkSoftDependency();
+    }
+    private void connectDatabase(){
         try {
-            mySQL.connect();
+            dataConnection.connect();
         } catch (SQLException e) {
             this.setEnabled(false);
             e.printStackTrace();
@@ -41,11 +55,8 @@ public class VProcessing extends JavaPlugin {
             this.setEnabled(false);
             e.printStackTrace();
         }
-        setupCommands();
-        setupEventListener();
-        Bukkit.getOnlinePlayers().stream().forEach(player -> PlayerSession.getSession(player));
-        checkSoftDependency();
     }
+
     private void checkSoftDependency(){
         if(!settings.useHolograms())
             return;

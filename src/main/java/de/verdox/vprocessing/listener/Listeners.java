@@ -40,7 +40,6 @@ public class Listeners implements Listener {
     public void blockInteract(PlayerInteractEvent e){
         Block block = e.getClickedBlock();
         Player p = e.getPlayer();
-        e.setCancelled(true);
         if(block == null)
             return;
         if(!VProcessing.processConfiguration.locationCache.containsKey(block.getLocation()))
@@ -48,6 +47,7 @@ public class Listeners implements Listener {
         Processer processer = VProcessing.processConfiguration.locationCache.get(block.getLocation());
         if(processer == null)
             return;
+        e.setCancelled(true);
         p.openInventory(new ProcesserGUI(processer).gui());
     }
 
@@ -100,7 +100,7 @@ public class Listeners implements Listener {
                     if(session.hasPlayerTask(processer)){
                         ProcessTask task = session.getTask(processer);
                         if(!task.isFinished())
-                            return;
+                             return;
                         if(!InventoryHandler.givePlayerProcessedItems(p,processer)){
                             p.sendMessage(ErrorMessage.Not_Enough_InvSpace.getMessage());
                             return;

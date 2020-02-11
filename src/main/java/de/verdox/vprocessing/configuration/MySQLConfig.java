@@ -9,7 +9,7 @@ public class MySQLConfig extends Configuration{
 
     @Override
     void setupConfig() {
-        config.options().header("Config to setup processers, amounts etc...");
+        config.options().header("Config to setup MySQL-Connection");
         config.addDefault("MySQL.DATABASE","v-processing");
         config.addDefault("MySQL.HOST","localhost");
         config.addDefault("MySQL.PORT",3306);
