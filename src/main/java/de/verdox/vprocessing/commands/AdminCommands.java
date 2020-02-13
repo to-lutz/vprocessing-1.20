@@ -2,9 +2,14 @@ package de.verdox.vprocessing.commands;
 
 import de.verdox.vprocessing.VProcessing;
 import de.verdox.vprocessing.configuration.messages.ErrorMessage;
+import de.verdox.vprocessing.configuration.messages.SuccessMessage;
 import de.verdox.vprocessing.model.Processer;
 import de.verdox.vprocessing.model.ProcesserGUI;
+import de.verdox.vprocessing.utils.ApiversionChecker;
+import de.verdox.vprocessing.utils.InventoryHandler;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -14,7 +19,22 @@ import org.bukkit.util.RayTraceResult;
 public class AdminCommands implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-        if(args.length == 2){
+        if(args.length == 1){
+            if(args[0].equalsIgnoreCase("list")){
+                for(String processerID : VProcessing.processConfiguration.processerCache.keySet()){
+                    sender.sendMessage(ChatColor.translateAlternateColorCodes('&',"&8- &b"+processerID));
+                }
+            }
+            else if(args[0].equalsIgnoreCase("help")){
+                sender.sendMessage(ChatColor.translateAlternateColorCodes('&',"&8]======[&4V-Processing&8]======["));
+                sender.sendMessage(ChatColor.translateAlternateColorCodes('&',"&7/&evproc &8<&aprocesser&8> &bgive &8- &6Gives you required Items for the processer&7!"));
+                sender.sendMessage(ChatColor.translateAlternateColorCodes('&',"&7/&evproc &8<&aprocesser&8> &bset &8- &6Sets the position of the processer&7!"));
+                sender.sendMessage(ChatColor.translateAlternateColorCodes('&',"&7/&evproc &8<&aprocesser&8> &bopen &8- &6Opens the Processer&7!"));
+                sender.sendMessage(ChatColor.translateAlternateColorCodes('&',"&7/&evproc &blist &8- &6Lists up all processers&7!"));
+                sender.sendMessage(ChatColor.translateAlternateColorCodes('&',"&7/&evproc &8<&aprocesser&8> &bset &8- &6Sets the position of the processer&7!"));
+            }
+        }
+        else if(args.length == 2){
             String processerID = args[0];
             if(!VProcessing.processConfiguration.exist(processerID)){
                 sender.sendMessage(ErrorMessage.No_Processer.getMessage());
@@ -29,26 +49,45 @@ public class AdminCommands implements CommandExecutor {
                 p.openInventory(new ProcesserGUI(processer).gui());
                 return true;
             }
-            if(args[1].equalsIgnoreCase("set")){
+            else if(args[1].equalsIgnoreCase("set")){
                 if(!(sender instanceof Player))
                     return false;
                 Player p = (Player) sender;
-                RayTraceResult result = p.rayTraceBlocks(5);
-                if(result==null){
-                    p.sendMessage("You are not looking at a Block, maybe air?");
-                    return false;
-                }
+                Location newLoc;
 
-                Location newLoc = result.getHitBlock().getLocation();
-
-                if(VProcessing.processConfiguration.changeLocation(processerID,newLoc)){
-                    p.sendMessage("Successfully changed Location!");
+                if(ApiversionChecker.isLegacyVersion(VProcessing.plugin)){
+                   Block block =  p.getTargetBlock(null,5);
+                   if(block == null){
+                       p.sendMessage(ErrorMessage.Look_At_Block.getMessage());
+                       return false;
+                   }
+                   newLoc = block.getLocation();
                 }
                 else {
-                    p.sendMessage("Location already in use or null!");
+                    RayTraceResult result = p.rayTraceBlocks(5);
+                    if(result==null){
+                        p.sendMessage(ErrorMessage.Look_At_Block.getMessage());
+                        return false;
+                    }
+
+                    newLoc = result.getHitBlock().getLocation();
+                }
+
+                if(VProcessing.processConfiguration.changeLocation(processerID,newLoc)){
+                    p.sendMessage(SuccessMessage.Successfully_Changed_Loc.getMessage());
+                }
+                else {
+                    p.sendMessage(ErrorMessage.Loc_Already_Used.getMessage());
                 }
 
                 return true;
+            }
+            else if(args[1].equalsIgnoreCase("get")){
+                if(!(sender instanceof Player))
+                    return false;
+                Player p = (Player) sender;
+                InventoryHandler.givePlayerRequiredItems(p,processer);
+                p.sendMessage(SuccessMessage.Successfully_Command.getMessage());
             }
         }
         return false;

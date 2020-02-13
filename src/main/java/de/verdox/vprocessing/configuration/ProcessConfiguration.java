@@ -5,6 +5,7 @@ import com.gmail.filoghost.holographicdisplays.api.HologramsAPI;
 import de.verdox.vprocessing.VProcessing;
 import de.verdox.vprocessing.configuration.messages.SuccessMessage;
 import de.verdox.vprocessing.model.Processer;
+import de.verdox.vprocessing.utils.ApiversionChecker;
 import de.verdox.vprocessing.utils.Serializer;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Location;
@@ -38,6 +39,8 @@ public class ProcessConfiguration extends Configuration{
         return processerCache.containsKey(processerID);
     }
 
+    // Creates Holograms at Location of a Processer
+    // Linescounter for adjusting hologram height
     private boolean createHologram(Processer processer){
         if(processer == null)
             return false;
@@ -78,6 +81,7 @@ public class ProcessConfiguration extends Configuration{
         return true;
     }
 
+    // Changes Location of Processer
     public boolean changeLocation (String processerID, Location loc){
         if(processerID == null)
             return false;
@@ -102,6 +106,7 @@ public class ProcessConfiguration extends Configuration{
         return true;
     }
 
+    // Initiates the Processer Cache
     private void initProcesserCache(){
         processerCache = new HashMap<>();
         for(String processerID:config.getConfigurationSection(configSections.PROCESSER.name()).getKeys(false)){
@@ -122,24 +127,45 @@ public class ProcessConfiguration extends Configuration{
     void setupConfig() {
         if(!file.exists()){
             config.options().header("Config to setup processers, amounts etc...");
-            config.addDefault(configSections.PROCESSER+".processer_1."+configSections.PROCESSER_NAME,"&aMühle");
+            config.addDefault(configSections.PROCESSER+".processer_1."+configSections.PROCESSER_NAME,"&aMill");
             config.addDefault(configSections.PROCESSER+".processer_1."+configSections.DURATION,60);
             config.addDefault(configSections.PROCESSER+".processer_1."+configSections.USE_HOLOGRAM,true);
             config.addDefault(configSections.PROCESSER+".processer_1."+configSections.USE_LARGE_HOLOGRAM,true);
-            config.addDefault(configSections.PROCESSER+".processer_1."+configSections.required_items+".item_1."+configSections.DISPLAY_NAME,"&7Mehl");
-            config.addDefault(configSections.PROCESSER+".processer_1."+configSections.required_items+".item_1."+configSections.ID,"BONE_MEAL");
-            config.addDefault(configSections.PROCESSER+".processer_1."+configSections.required_items+".item_1."+configSections.AMOUNT,20);
+            config.addDefault(configSections.PROCESSER+".processer_1."+configSections.required_items+".item_1."+configSections.DISPLAY_NAME,"&7Flour");
 
-            config.addDefault(configSections.PROCESSER+".processer_1."+configSections.processed_items+".item_1."+configSections.DISPLAY_NAME,"&7Mehl");
-            config.addDefault(configSections.PROCESSER+".processer_1."+configSections.processed_items+".item_1."+configSections.ID,"BONE_MEAL");
-            config.addDefault(configSections.PROCESSER+".processer_1."+configSections.processed_items+".item_1."+configSections.AMOUNT,20);
+
+            if(ApiversionChecker.isLegacyVersion(VProcessing.plugin)){
+                config.addDefault(configSections.PROCESSER+".processer_1."+configSections.required_items+".item_1."+configSections.ID,"INK_SACK");
+                config.addDefault(configSections.PROCESSER+".processer_1."+configSections.required_items+".item_1."+configSections.SUB_ID,15);
+            }
+            else
+                config.addDefault(configSections.PROCESSER+".processer_1."+configSections.required_items+".item_1."+configSections.ID,"BONE_MEAL");
+
+            config.addDefault(configSections.PROCESSER+".processer_1."+configSections.required_items+".item_1."+configSections.AMOUNT,5);
+
+            config.addDefault(configSections.PROCESSER+".processer_1."+configSections.processed_items+".item_1."+configSections.DISPLAY_NAME,"&6Bread");
+
+
+
+            if(ApiversionChecker.isLegacyVersion(VProcessing.plugin)){
+                config.addDefault(configSections.PROCESSER+".processer_1."+configSections.processed_items+".item_1."+configSections.ID,"BREAD");
+                config.addDefault(configSections.PROCESSER+".processer_1."+configSections.processed_items+".item_1."+configSections.SUB_ID,0);
+            }
+            else
+                config.addDefault(configSections.PROCESSER+".processer_1."+configSections.processed_items+".item_1."+configSections.ID,"BREAD");
+
+            config.addDefault(configSections.PROCESSER+".processer_1."+configSections.processed_items+".item_1."+configSections.AMOUNT,1);
+            if(ApiversionChecker.isLegacyVersion(VProcessing.plugin))
+                config.addDefault(configSections.PROCESSER+".processer_1."+configSections.processed_items+".item_1."+configSections.SUB_ID,1);
             config.addDefault(configSections.PROCESSER+".processer_1."+configSections.LOCATION,"none");
 
             config.options().copyDefaults(true);
             save();
+            VProcessing.consoleMessage("&bProcessers.yml loaded successfully!");
         }
     }
 
+    // Changes Location in configfile
     private boolean changeLoc(String processerID, Location loc){
         if(!exist(processerID))
             return false;
@@ -148,8 +174,10 @@ public class ProcessConfiguration extends Configuration{
         return true;
     }
 
+    // Loads Processers from configFile
     private Processer getProcesser (String processerID){
-
+        if(processerID == null)
+            throw new NullPointerException("getProcesser can't handle null as parameter!");
         if(!config.isSet(configSections.PROCESSER.name()+"."+processerID)){
             throw new IllegalArgumentException("Processer couldn't be found in config!");
         }
@@ -173,9 +201,27 @@ public class ProcessConfiguration extends Configuration{
             String ID = config.getString(item.getCurrentPath()+"."+configSections.ID);
             int amount = config.getInt(item.getCurrentPath()+"."+configSections.AMOUNT);
 
-            ItemStack stack = new ItemStack(Material.getMaterial(ID),amount);
+            ItemStack stack;
+            if(ApiversionChecker.isLegacyVersion(VProcessing.plugin)){
+                int subID = config.getInt(item.getCurrentPath()+"."+configSections.SUB_ID);
+                try{
+                    Material mat = Material.valueOf(ID);
+                    stack = new ItemStack(mat,amount,(byte)subID);
+                }
+                catch(IllegalArgumentException e){
+                    VProcessing.consoleMessage("&4The Material&7: &6"+ID+" &4does not exist!");
+                    for(Material m:Material.values()){
+                        VProcessing.consoleMessage("&e"+m.name());
+                    }
+                    throw new IllegalArgumentException("Material does not exist");
+                }
+            }
+            else {
+                stack = new ItemStack(Material.getMaterial(ID),amount);
+            }
+
             ItemMeta meta = stack.getItemMeta();
-            meta.setDisplayName(displayName);
+            meta.setDisplayName(ChatColor.translateAlternateColorCodes('&',displayName));
             stack.setItemMeta(meta);
             requiredItems.add(stack);
         }
@@ -188,15 +234,35 @@ public class ProcessConfiguration extends Configuration{
             useHologram = config.getBoolean(configSections.PROCESSER+"."+processerID+"."+configSections.USE_HOLOGRAM);
             useLargeHologram = config.getBoolean(configSections.PROCESSER+"."+processerID+"."+configSections.USE_LARGE_HOLOGRAM);
 
-            ItemStack stack = new ItemStack(Material.getMaterial(ID),amount);
+            ItemStack stack;
+            if(ApiversionChecker.isLegacyVersion(VProcessing.plugin)){
+                int subID = config.getInt(item.getCurrentPath()+"."+configSections.SUB_ID);
+                try{
+                    Material mat = Material.valueOf(ID);
+                    stack = new ItemStack(mat,amount,(byte)subID);
+                }
+                catch(IllegalArgumentException e){
+                    VProcessing.consoleMessage("&4The Material&7: &6"+ID+" &4does not exist!");
+                    for(Material m:Material.values()){
+                        VProcessing.consoleMessage("&e"+m.name());
+                    }
+                    throw new IllegalArgumentException("Material does not exist");
+                }
+            }
+            else {
+                stack = new ItemStack(Material.getMaterial(ID),amount);
+            }
+
             ItemMeta meta = stack.getItemMeta();
-            meta.setDisplayName(displayName);
+            meta.setDisplayName(ChatColor.translateAlternateColorCodes('&',displayName));
             stack.setItemMeta(meta);
             processedItems.add(stack);
         }
         return new Processer(processerID,name,duration,loc,requiredItems,processedItems,useHologram,useLargeHologram);
     }
 
+    // Will be changed in future
+    // Just to avoid writing mistakes.
     enum configSections{
         PROCESSER,
         required_items,
@@ -209,5 +275,7 @@ public class ProcessConfiguration extends Configuration{
         LOCATION,
         USE_HOLOGRAM,
         USE_LARGE_HOLOGRAM,
+        ITEM_ID,
+        SUB_ID,
     }
 }

@@ -70,8 +70,8 @@ public class Listeners implements Listener {
 
             // Es handelt sich um einen Processer-Identifier!
 
-            if(identifier.contains("Processer: ")){
-                identifier = identifier.replace("Processer: ","");
+            if(identifier.contains(ProcesserGUI.identifier)){
+                identifier = identifier.replace(ProcesserGUI.identifier,"");
                 if(!config.exist(identifier))
                     throw new IllegalStateException("The given Processer: "+identifier+" does not exist somehow?");
                 Processer processer = config.processerCache.get(identifier);

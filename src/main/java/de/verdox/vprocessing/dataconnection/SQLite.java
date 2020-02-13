@@ -21,10 +21,13 @@ public class SQLite extends DataConnectionImpl{
     public SQLite(Plugin plugin,String databaseName,String pluginDirectory){
         this.plugin = plugin;
         this.file = new File("plugins/"+pluginDirectory,databaseName+".db");
-        try {
-            file.createNewFile();
-        } catch (IOException e) {
-            e.printStackTrace();
+        if(!file.exists()){
+            try {
+                VProcessing.consoleMessage("&eCreated SQLite File at&7: &6"+file.getAbsolutePath());
+                file.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -32,9 +35,9 @@ public class SQLite extends DataConnectionImpl{
         if(connection!=null && !connection.isClosed()){
             return;
         }
-        connection = DriverManager.getConnection("jdbc:sqlite:"+String.valueOf(file.toURI()));
+        connection = DriverManager.getConnection("jdbc:sqlite:"+file.getAbsolutePath());
         initTables();
-        System.out.println("SQLite Connection established!");
+        VProcessing.consoleMessage("&bSQLite connection established!");
     }
 
     @Override
@@ -55,7 +58,7 @@ public class SQLite extends DataConnectionImpl{
         + "taskStarted integer, \n"
         + "taskEnd integer"
                 +");");
-        System.out.println("Tables loaded");
+        VProcessing.consoleMessage("&bSQLite Tables loaded loaded successfully!");
     }
 
     @Override

@@ -14,7 +14,6 @@ public class PlayerSession {
     public static synchronized PlayerSession addToCache(Player p){
         PlayerSession s = new PlayerSession(p);
         cache.add(s);
-        System.out.println("Created PlayerSession for: "+p.getDisplayName());
         VProcessing.dataConnection.getTasksOfPlayer(p);
         return s;
     }

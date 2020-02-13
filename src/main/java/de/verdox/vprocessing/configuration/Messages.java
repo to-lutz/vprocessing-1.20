@@ -1,5 +1,6 @@
 package de.verdox.vprocessing.configuration;
 
+import de.verdox.vprocessing.VProcessing;
 import de.verdox.vprocessing.configuration.messages.ErrorMessage;
 import de.verdox.vprocessing.configuration.messages.SuccessMessage;
 import org.bukkit.plugin.Plugin;
@@ -23,5 +24,6 @@ public class Messages extends Configuration{
             }
             config.options().copyDefaults(true);
             save();
+        VProcessing.consoleMessage("&bMessages.yml loaded successfully!");
     }
 }

@@ -27,6 +27,8 @@ public class Serializer {
 
         String[] parts = locString.split(", ");
         World world = Bukkit.getWorld(parts[0]);
+        if(world == null)
+            throw new NullPointerException("The world "+parts[0]+" does not exist ["+locString+"]");
         try{
             double x = Double.parseDouble(parts[1]);
             double y = Double.parseDouble(parts[2]);

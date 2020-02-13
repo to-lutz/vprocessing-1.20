@@ -16,7 +16,7 @@ public class InventoryHandler {
         List<ItemStack> processedItems = processer.getOutputItems();
         int slotsNeeded = processedItems.size();
         int counter = 0;
-        for(ItemStack s:p.getInventory().getStorageContents()){
+        for(ItemStack s:p.getInventory().getContents()){
             if(s==null)
                 counter++;
         }
@@ -36,7 +36,7 @@ public class InventoryHandler {
         List<ItemStack> requiredItems = processer.getRequiredItems();
         int slotsNeeded = requiredItems.size();
         int counter = 0;
-        for(ItemStack s:p.getInventory().getStorageContents()){
+        for(ItemStack s:p.getInventory().getContents()){
             if(s==null)
                 counter++;
         }
@@ -56,14 +56,20 @@ public class InventoryHandler {
         if(processer == null)
             return false;
         Iterator<ItemStack> it = processer.getRequiredItems().iterator();
+        int counter = 0;
         while(it.hasNext()){
             ItemStack stack = it.next();
-            ItemStack comparer = new ItemStack(stack.getType(),1);
-            comparer.setItemMeta(stack.getItemMeta());
-            if(!p.getInventory().containsAtLeast(comparer,stack.getAmount()))
-                return false;
+            for(ItemStack i:p.getInventory().getContents()){
+                if(i==null)
+                    continue;
+                if(i.isSimilar(stack)){
+                    counter+=i.getAmount();
+                }
+                if(counter>=stack.getAmount())
+                    return true;
+            }
         }
-        return true;
+        return false;
     }
     public static void takeItems(Player p,Processer processer){
         if(p == null)

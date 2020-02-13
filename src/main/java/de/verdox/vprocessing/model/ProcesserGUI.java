@@ -7,9 +7,10 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 public class ProcesserGUI extends GUI {
     private Processer processer;
+    public static String identifier = "Processer: ";
     String processerID;
     public ProcesserGUI(Processer processer){
-        super(45,processer.getName(),"Processer: "+processer.getProcesserID());
+        super(45,processer.getName(),identifier+processer.getProcesserID());
         this.processer = processer;
         this.processerID = processer.getProcesserID();
     }

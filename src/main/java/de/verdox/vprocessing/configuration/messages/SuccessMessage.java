@@ -8,6 +8,7 @@ public enum SuccessMessage {
     Successfully_Command("&aSuccessfully done!"),
     Successfully_loaded_files("&aSuccessfully loaded your Playerfiles from the database!"),
     Successfully_Processed("&aProcessed Items successfully!"),
+    Successfully_Changed_Loc("&aLocation successfully changed!"),
     Process_Begin("&aBeginning processing your items!"),
     GUI_Start_Task("&6Process Items"),
     GUI_Accept("&aTake processed items"),

@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/v-processing.iml" filepath="$PROJECT_DIR$/.idea/v-processing.iml" />
+      <module fileurl="file://$PROJECT_DIR$/V-processing.iml" filepath="$PROJECT_DIR$/V-processing.iml" />
     </modules>
   </component>
 </project>

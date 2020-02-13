@@ -29,8 +29,8 @@ public class MySQL extends DataConnectionImpl{
 
         Class.forName("com.mysql.jdbc.Driver");
         connection = DriverManager.getConnection("jdbc:mysql://" + this.host+ ":" + this.port + "/" + this.database, this.username, this.password);
-        System.out.println("MySQL Connection established");
         initTables();
+        VProcessing.consoleMessage("&bMySQL connection established!");
     }
 
     public synchronized boolean disconnect() throws SQLException {
@@ -51,7 +51,7 @@ public class MySQL extends DataConnectionImpl{
                 "  `taskEnd` BIGINT(64) NOT NULL DEFAULT '0'," +
                 "  PRIMARY KEY (`id`)\n" +
                 ") ");
-        System.out.println("Tables loaded");
+        VProcessing.consoleMessage("&bMySQL Tables loaded loaded successfully!");
     }
 
     public void createTask(ProcessTask task) throws SQLException {

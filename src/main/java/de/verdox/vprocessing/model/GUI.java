@@ -2,6 +2,7 @@ package de.verdox.vprocessing.model;
 
 import de.verdox.vprocessing.VProcessing;
 import de.verdox.vprocessing.configuration.messages.SuccessMessage;
+import de.verdox.vprocessing.utils.ApiversionChecker;
 import de.verdox.vprocessing.utils.HiddenStringUtils;
 import de.verdox.vprocessing.utils.SecondsConverter;
 import org.bukkit.Bukkit;
@@ -47,21 +48,40 @@ public abstract class GUI {
     public abstract void setContent();
     public abstract void updateInventory();
     private ItemStack identifierStack(){
-        ItemStack stack = new ItemStack(Material.GRAY_STAINED_GLASS_PANE,1);
+        ItemStack stack;
+        if(ApiversionChecker.isLegacyVersion(VProcessing.plugin)){
+            stack = new ItemStack(Material.getMaterial("STAINED_GLASS_PANE"),1,(byte) 7);
+        }
+        else{
+            stack = new ItemStack(Material.GRAY_STAINED_GLASS_PANE,1);
+        }
+
         ItemMeta meta = stack.getItemMeta();
         meta.setDisplayName(ChatColor.translateAlternateColorCodes('&',SuccessMessage.GUI_Border.getMessage()+HiddenStringUtils.encodeString(identifier)));
         stack.setItemMeta(meta);
         return stack;
     }
     public static ItemStack acceptButton(){
-        ItemStack stack = new ItemStack(Material.GREEN_STAINED_GLASS_PANE,1);
+        ItemStack stack;
+        if(ApiversionChecker.isLegacyVersion(VProcessing.plugin)){
+            stack = new ItemStack(Material.getMaterial("STAINED_GLASS_PANE"),1,(byte) 13);
+        }
+        else{
+            stack = new ItemStack(Material.GREEN_STAINED_GLASS_PANE,1);
+        }
         ItemMeta meta = stack.getItemMeta();
         meta.setDisplayName(ChatColor.translateAlternateColorCodes('&',SuccessMessage.GUI_Accept.getMessage()));
         stack.setItemMeta(meta);
         return stack;
     }
     public static ItemStack process_Button(Processer processer){
-        ItemStack stack = new ItemStack(Material.ORANGE_STAINED_GLASS_PANE,1);
+        ItemStack stack;
+        if(ApiversionChecker.isLegacyVersion(VProcessing.plugin)){
+            stack = new ItemStack(Material.getMaterial("STAINED_GLASS_PANE"),1,(byte) 1);
+        }
+        else{
+            stack = new ItemStack(Material.ORANGE_STAINED_GLASS_PANE,1);
+        }
         ItemMeta meta = stack.getItemMeta();
         meta.setDisplayName(ChatColor.translateAlternateColorCodes('&',SuccessMessage.GUI_Start_Task.getMessage()));
         if(processer!=null){
@@ -89,14 +109,26 @@ public abstract class GUI {
         return stack;
     }
     public static ItemStack idleButton(){
-        ItemStack stack = new ItemStack(Material.YELLOW_STAINED_GLASS_PANE,1);
+        ItemStack stack;
+        if(ApiversionChecker.isLegacyVersion(VProcessing.plugin)){
+            stack = new ItemStack(Material.getMaterial("STAINED_GLASS_PANE"),1,(byte) 4);
+        }
+        else{
+            stack = new ItemStack(Material.YELLOW_STAINED_GLASS_PANE,1);
+        }
         ItemMeta meta = stack.getItemMeta();
         meta.setDisplayName(ChatColor.translateAlternateColorCodes('&',SuccessMessage.GUI_Idle.getMessage()));
         stack.setItemMeta(meta);
         return stack;
     }
     public static ItemStack activeTaskButton(ProcessTask task){
-        ItemStack stack = new ItemStack(Material.LIGHT_BLUE_STAINED_GLASS_PANE,1);
+        ItemStack stack;
+        if(ApiversionChecker.isLegacyVersion(VProcessing.plugin)){
+            stack = new ItemStack(Material.getMaterial("STAINED_GLASS_PANE"),1,(byte) 3);
+        }
+        else{
+            stack = new ItemStack(Material.LIGHT_BLUE_STAINED_GLASS_PANE,1);
+        }
         ItemMeta meta = stack.getItemMeta();
 
         float remainingSeconds = Math.abs((System.currentTimeMillis()-task.getTimestampStop())/1000);
@@ -111,28 +143,52 @@ public abstract class GUI {
         return stack;
     }
     public static ItemStack cancelButton(){
-        ItemStack stack = new ItemStack(Material.RED_STAINED_GLASS_PANE,1);
+        ItemStack stack;
+        if(ApiversionChecker.isLegacyVersion(VProcessing.plugin)){
+            stack = new ItemStack(Material.getMaterial("STAINED_GLASS_PANE"),1,(byte) 14);
+        }
+        else{
+            stack = new ItemStack(Material.RED_STAINED_GLASS_PANE,1);
+        }
         ItemMeta meta = stack.getItemMeta();
         meta.setDisplayName(ChatColor.translateAlternateColorCodes('&',SuccessMessage.GUI_Cancel_Button.getMessage()));
         stack.setItemMeta(meta);
         return stack;
     }
     public static ItemStack border(){
-        ItemStack stack = new ItemStack(Material.GRAY_STAINED_GLASS_PANE,1);
+        ItemStack stack;
+        if(ApiversionChecker.isLegacyVersion(VProcessing.plugin)){
+            stack = new ItemStack(Material.getMaterial("STAINED_GLASS_PANE"),1,(byte) 7);
+        }
+        else{
+            stack = new ItemStack(Material.GRAY_STAINED_GLASS_PANE,1);
+        }
         ItemMeta meta = stack.getItemMeta();
         meta.setDisplayName(ChatColor.translateAlternateColorCodes('&',SuccessMessage.GUI_Border.getMessage()));
         stack.setItemMeta(meta);
         return stack;
     }
     public static ItemStack borderBlack(){
-        ItemStack stack = new ItemStack(Material.BLACK_STAINED_GLASS_PANE,1);
+        ItemStack stack;
+        if(ApiversionChecker.isLegacyVersion(VProcessing.plugin)){
+            stack = new ItemStack(Material.getMaterial("STAINED_GLASS_PANE"),1,(byte) 15);
+        }
+        else{
+            stack = new ItemStack(Material.BLACK_STAINED_GLASS_PANE,1);
+        }
         ItemMeta meta = stack.getItemMeta();
         meta.setDisplayName(ChatColor.translateAlternateColorCodes('&',SuccessMessage.GUI_Border.getMessage()));
         stack.setItemMeta(meta);
         return stack;
     }
     public static ItemStack percentage(int percent){
-        ItemStack stack = new ItemStack(Material.GREEN_STAINED_GLASS_PANE,1);
+        ItemStack stack;
+        if(ApiversionChecker.isLegacyVersion(VProcessing.plugin)){
+            stack = new ItemStack(Material.getMaterial("STAINED_GLASS_PANE"),1,(byte) 13);
+        }
+        else{
+            stack = new ItemStack(Material.GREEN_STAINED_GLASS_PANE,1);
+        }
         ItemMeta meta = stack.getItemMeta();
         meta.setDisplayName(ChatColor.translateAlternateColorCodes('&',"&b"+percent+"%"));
         stack.setItemMeta(meta);

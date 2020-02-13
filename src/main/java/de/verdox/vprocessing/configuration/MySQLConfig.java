@@ -1,5 +1,6 @@
 package de.verdox.vprocessing.configuration;
 
+import de.verdox.vprocessing.VProcessing;
 import org.bukkit.plugin.Plugin;
 
 public class MySQLConfig extends Configuration{
@@ -18,6 +19,7 @@ public class MySQLConfig extends Configuration{
 
         config.options().copyDefaults(true);
         save();
+        VProcessing.consoleMessage("&bMySQL.yml loaded successfully!");
     }
 
     public String getHost(){

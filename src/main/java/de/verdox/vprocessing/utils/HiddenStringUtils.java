@@ -3,6 +3,9 @@ import java.nio.charset.Charset;
 
 import org.bukkit.ChatColor;
 
+// Credits to filoghost for this usefull Class
+// https://bukkit.org/threads/storing-hidden-data-in-itemstacks-using-colors-persistent-no-nms.319970/
+
 public class HiddenStringUtils {
 
     // String constants. TODO Change them to something unique to avoid conflict with other plugins!
@@ -23,7 +26,6 @@ public class HiddenStringUtils {
     public static String extractHiddenString(String input) {
         return colorsToString(extract(input));
     }
-
 
     public static String replaceHiddenString(String input, String hiddenString) {
         if (input == null) return null;

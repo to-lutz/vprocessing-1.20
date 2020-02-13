@@ -1,5 +1,6 @@
 package de.verdox.vprocessing.configuration;
 
+import de.verdox.vprocessing.VProcessing;
 import org.bukkit.plugin.Plugin;
 
 public class Settings extends Configuration {
@@ -10,12 +11,15 @@ public class Settings extends Configuration {
     @Override
     void setupConfig() {
         config.options().header("General Settings");
-        config.addDefault("SETTINGS.UseMySQL",true);
-        config.addDefault("SETTINGS.UseHolographicDisplays",true);
+        config.addDefault("SETTINGS.UseMySQL",false);
+        config.addDefault("SETTINGS.UseHolographicDisplays",false);
+        config.addDefault("SETTINGS.UseUpdateChecker",true);
         config.options().copyDefaults(true);
         save();
+        VProcessing.consoleMessage("&bSettings.yml loaded successfully!");
     }
 
     public boolean useMySQL(){return config.getBoolean("SETTINGS.UseMySQL");}
     public boolean useHolograms(){return config.getBoolean("SETTINGS.UseHolographicDisplays");}
+    public boolean useUpdateChecker(){return config.getBoolean("SETTINGS.UseUpdateChecker");}
 }
