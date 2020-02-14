@@ -19,9 +19,11 @@ import java.util.List;
 public abstract class GUI {
     protected Inventory inv;
     protected String identifier;
-    public GUI(int size, String title, String identifier){
+    protected String ID;
+    public GUI(int size, String title, String identifier, String ID){
         this.inv = Bukkit.createInventory(null,size,ChatColor.translateAlternateColorCodes('&',title));
         this.identifier = identifier;
+        this.ID = ID;
 
         for(int i = 0;i<9;i++){
             inv.setItem(i,border());
@@ -29,9 +31,9 @@ public abstract class GUI {
         for(int i = inv.getSize()-9;i<inv.getSize();i++){
             inv.setItem(i,border());
         }
-        inv.setItem(inv.getSize()-1,identifierStack());
         setContent();
         updateInventory();
+        inv.setItem(inv.getSize()-1,identifierStack());
     }
 
     protected BukkitRunnable runAsync(final Runnable runnable){

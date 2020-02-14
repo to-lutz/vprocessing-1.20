@@ -4,7 +4,8 @@ import de.verdox.vprocessing.VProcessing;
 import org.bukkit.ChatColor;
 
 public enum ErrorMessage {
-    No_Processer("Processer does not exist!"),
+    No_Processer_or_Category("&4Processer&7/&4Category &cdoes not exist!"),
+    No_Processer("&cProcesser does not exist!"),
     Not_Enough_Items("&cYou don't have the required Items!"),
     Already_Processing("&cYou are already processing here!"),
     Not_Enough_InvSpace("&cYou don't have enough space in your inventory!"),

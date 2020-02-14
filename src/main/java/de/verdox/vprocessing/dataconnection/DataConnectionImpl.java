@@ -15,6 +15,7 @@ public abstract class DataConnectionImpl {
     public abstract void createTask(ProcessTask task) throws SQLException;
     public abstract void getTasksOfPlayer(Player p);
     public abstract void removeTask(UUID uuid, String processerID) throws SQLException;
+    public abstract boolean isConnected() throws SQLException;
 
     static void runAsync(final Runnable runnable, Plugin plugin){
         BukkitRunnable r = new BukkitRunnable() {

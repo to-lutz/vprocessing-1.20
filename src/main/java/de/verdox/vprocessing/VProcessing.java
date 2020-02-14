@@ -1,10 +1,7 @@
 package de.verdox.vprocessing;
 
 import de.verdox.vprocessing.commands.AdminCommands;
-import de.verdox.vprocessing.configuration.Messages;
-import de.verdox.vprocessing.configuration.MySQLConfig;
-import de.verdox.vprocessing.configuration.ProcessConfiguration;
-import de.verdox.vprocessing.configuration.Settings;
+import de.verdox.vprocessing.configuration.*;
 import de.verdox.vprocessing.dataconnection.DataConnectionImpl;
 import de.verdox.vprocessing.dataconnection.MySQL;
 import de.verdox.vprocessing.dataconnection.PlayerSession;
@@ -20,6 +17,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.io.IOException;
 import java.sql.SQLException;
 
 public class VProcessing extends JavaPlugin {
@@ -29,6 +27,7 @@ public class VProcessing extends JavaPlugin {
     public static Messages messages;
     public static MySQLConfig mySQLConfig;
     public static Settings settings;
+    public static CategoryConfiguration categoryConfiguration;
     public static DataConnectionImpl dataConnection;
     private static int bStatsID = 6476;
     private static int spigotID = 75112;
@@ -42,19 +41,27 @@ public class VProcessing extends JavaPlugin {
             consoleMessage("&eFound new Spigot Version&7: > &b1.12");
         plugin = this;
 
-        settings = new Settings(this,"settings.yml","V-Processing/settings");
+        settings = new Settings(this,"settings.yml","/settings");
         if(!checkSoftDependency()){
             this.setEnabled(false);
             return;
         }
-        messages = new Messages(this,"messages.yml","V-Processing/settings");
-        mySQLConfig = new MySQLConfig(this,"MySQL.yml","V-Processing/dataconnection");
-        processConfiguration = new ProcessConfiguration(this,"processer.yml","V-Processing/ingame");
+        messages = new Messages(this,"messages.yml","/settings");
+        mySQLConfig = new MySQLConfig(this,"MySQL.yml","/dataconnection");
+        processConfiguration = new ProcessConfiguration(this,"processer.yml","/ingame");
+        categoryConfiguration = new CategoryConfiguration(this,"categories.yml","/ingame");
         if(settings.useMySQL()){
             dataConnection = new MySQL(mySQLConfig.getHost(),mySQLConfig.getPort(),mySQLConfig.getDatabase(),mySQLConfig.getUsername(),mySQLConfig.getPassword());
         }
         else {
-            dataConnection = new SQLite(this,"v-Processing","V-processing/dataconnection");
+            try {
+                dataConnection = new SQLite(this,"v-Processing","/dataconnection");
+            } catch (IOException e) {
+                e.printStackTrace();
+                this.setEnabled(false);
+                consoleMessage("&4Plugin will shutdown due to an error occured.");
+                return;
+            }
         }
         connectDatabase();
         setupCommands();
@@ -85,6 +92,10 @@ public class VProcessing extends JavaPlugin {
         });
 
         VProcessing.consoleMessage("&aPlugin loaded successfully!");
+
+        Bukkit.getScheduler().runTaskTimerAsynchronously(this, () -> {
+            try {connectionCecker();} catch (SQLException e) {e.printStackTrace();} catch (ClassNotFoundException e) {e.printStackTrace();}
+        },100L, mySQLConfig.getPingTime()*20L);
     }
 
     private void initBStats(){
@@ -149,6 +160,14 @@ public class VProcessing extends JavaPlugin {
             return false;
         }
         return true;
+    }
+
+    private synchronized void connectionCecker() throws SQLException, ClassNotFoundException {
+        consoleMessage("&7Checking Databaseconnection");
+        if(dataConnection.isConnected())
+            return;
+        dataConnection.connect();
+        consoleMessage("&aSuccessfully reconnected Database");
     }
 
     private void setupCommands(){

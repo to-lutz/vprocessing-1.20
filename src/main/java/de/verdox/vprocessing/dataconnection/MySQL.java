@@ -95,4 +95,9 @@ public class MySQL extends DataConnectionImpl{
         preparedStatement.setString(2,processerID);
         preparedStatement.executeUpdate();
     }
+
+    @Override
+    public boolean isConnected() throws SQLException {
+        return !connection.isClosed();
+    }
 }

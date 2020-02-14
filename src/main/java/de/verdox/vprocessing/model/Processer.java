@@ -16,8 +16,9 @@ public class Processer {
     private final String processerID;
     private boolean useHologram;
     private boolean useLargeHologram;
+    private ItemStack guiIcon;
 
-    public Processer(String processerID,String name,int duration,Location loc, List<ItemStack> rI, List<ItemStack> oI, boolean useHologram, boolean useLargeHologram){
+    public Processer(String processerID,String name,int duration,Location loc, List<ItemStack> rI, List<ItemStack> oI, boolean useHologram, boolean useLargeHologram, ItemStack guiIcon){
         this.processerID = processerID;
         this.name = name;
         this.duration = duration;
@@ -26,36 +27,21 @@ public class Processer {
         this.outputItems = oI;
         this.useHologram = useHologram;
         this.useLargeHologram = useLargeHologram;
+        this.guiIcon = guiIcon;
     }
 
     public int getDuration() {
         return duration;
     }
 
-    public void setDuration(int duration) {
-        this.duration = duration;
-    }
-
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public List<ItemStack> getOutputItems() {return outputItems;}
-
-    public void setOutputItems(List<ItemStack> outputItems) {
-        this.outputItems = outputItems;
-    }
 
     public List<ItemStack> getRequiredItems() {
         return requiredItems;
-    }
-
-    public void setRequiredItems(List<ItemStack> requiredItems) {
-        this.requiredItems = requiredItems;
     }
 
     public Location getLocation() {
@@ -102,5 +88,9 @@ public class Processer {
 
     public boolean isUseLargeHologram() {
         return useLargeHologram;
+    }
+
+    public ItemStack getGuiIcon() {
+        return guiIcon;
     }
 }

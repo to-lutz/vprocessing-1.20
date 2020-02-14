@@ -10,7 +10,7 @@ public class ProcesserGUI extends GUI {
     public static String identifier = "Processer: ";
     String processerID;
     public ProcesserGUI(Processer processer){
-        super(45,processer.getName(),identifier+processer.getProcesserID());
+        super(45,processer.getName(),identifier+processer.getProcesserID(),processer.getProcesserID());
         this.processer = processer;
         this.processerID = processer.getProcesserID();
     }
@@ -72,9 +72,7 @@ public class ProcesserGUI extends GUI {
                             inv.setItem(31,GUI.borderBlack());
                         }
                         else{
-                            float difference = Math.abs((System.currentTimeMillis()-task.getTimestampStop())/1000);
-                            float duration = (task.getTimestampStop()-task.getTimestampStarted())/1000;
-                            int percentage = (int) ((1-(difference/duration))*100);
+                            int percentage = task.getPercentage();
                             //System.out.println(difference+" Sekunden noch!");
                             //System.out.println(percentage+"%");
 

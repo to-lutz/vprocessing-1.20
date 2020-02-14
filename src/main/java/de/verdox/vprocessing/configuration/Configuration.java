@@ -18,7 +18,7 @@ public abstract class Configuration {
         this.plugin = plugin;
         this.fileName = fileName;
         this.pluginDirectory = pluginDirectory;
-        this.file = new File("plugins/"+pluginDirectory,fileName);
+        this.file = new File(VProcessing.plugin.getDataFolder()+pluginDirectory,fileName);
         this.config = YamlConfiguration.loadConfiguration(file);
         setupConfig();
         save();

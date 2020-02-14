@@ -16,10 +16,11 @@ public class MySQLConfig extends Configuration{
         config.addDefault("MySQL.PORT",3306);
         config.addDefault("MySQL.USERNAME","root");
         config.addDefault("MySQL.PASSWORD","1234");
+        config.addDefault("MySQL.PingTime",600);
 
         config.options().copyDefaults(true);
         save();
-        VProcessing.consoleMessage("&bMySQL.yml loaded successfully!");
+        VProcessing.consoleMessage("&b"+fileName+" loaded successfully!");
     }
 
     public String getHost(){
@@ -41,4 +42,6 @@ public class MySQLConfig extends Configuration{
     public String getPassword(){
         return config.getString("MySQL.PASSWORD");
     }
+
+    public int getPingTime(){return config.getInt("MySQL.PingTime");}
 }

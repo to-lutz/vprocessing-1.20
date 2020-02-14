@@ -24,6 +24,6 @@ public class Messages extends Configuration{
             }
             config.options().copyDefaults(true);
             save();
-        VProcessing.consoleMessage("&bMessages.yml loaded successfully!");
+        VProcessing.consoleMessage("&b"+fileName+" loaded successfully!");
     }
 }

@@ -9,6 +9,7 @@ import org.bukkit.plugin.Plugin;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.sql.*;
 import java.util.UUID;
 
@@ -18,17 +19,11 @@ public class SQLite extends DataConnectionImpl{
     private File file;
     private Connection connection;
 
-    public SQLite(Plugin plugin,String databaseName,String pluginDirectory){
+    public SQLite(Plugin plugin,String databaseName,String pluginDirectory) throws IOException {
         this.plugin = plugin;
-        this.file = new File("plugins/"+pluginDirectory,databaseName+".db");
-        if(!file.exists()){
-            try {
-                VProcessing.consoleMessage("&eCreated SQLite File at&7: &6"+file.getAbsolutePath());
-                file.createNewFile();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
+        this.file = new File(VProcessing.plugin.getDataFolder()+pluginDirectory,databaseName+".db");
+        VProcessing.consoleMessage("&eLoaded SQLite File at&7: &6"+file.getAbsolutePath());
+        file.createNewFile();
     }
 
     public synchronized void connect() throws SQLException {
@@ -107,5 +102,10 @@ public class SQLite extends DataConnectionImpl{
         // ProcesserID
         preparedStatement.setString(2,processerID);
         preparedStatement.executeUpdate();
+    }
+
+    @Override
+    public boolean isConnected() throws SQLException {
+        return !connection.isClosed();
     }
 }

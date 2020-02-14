@@ -1,14 +1,12 @@
 package de.verdox.vprocessing.listener;
 
 import de.verdox.vprocessing.VProcessing;
+import de.verdox.vprocessing.configuration.CategoryConfiguration;
 import de.verdox.vprocessing.configuration.ProcessConfiguration;
 import de.verdox.vprocessing.configuration.messages.ErrorMessage;
 import de.verdox.vprocessing.configuration.messages.SuccessMessage;
 import de.verdox.vprocessing.dataconnection.PlayerSession;
-import de.verdox.vprocessing.model.GUI;
-import de.verdox.vprocessing.model.ProcessTask;
-import de.verdox.vprocessing.model.Processer;
-import de.verdox.vprocessing.model.ProcesserGUI;
+import de.verdox.vprocessing.model.*;
 import de.verdox.vprocessing.utils.InventoryHandler;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -21,6 +19,8 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.sql.SQLException;
+import java.util.List;
+import java.util.Optional;
 
 public class Listeners implements Listener {
 
@@ -40,15 +40,24 @@ public class Listeners implements Listener {
     public void blockInteract(PlayerInteractEvent e){
         Block block = e.getClickedBlock();
         Player p = e.getPlayer();
+
         if(block == null)
             return;
-        if(!VProcessing.processConfiguration.locationCache.containsKey(block.getLocation()))
-            return;
-        Processer processer = VProcessing.processConfiguration.locationCache.get(block.getLocation());
-        if(processer == null)
-            return;
-        e.setCancelled(true);
-        p.openInventory(new ProcesserGUI(processer).gui());
+
+        // Hier steht ein Processer
+        if(VProcessing.processConfiguration.locationCache.containsKey(block.getLocation())){
+            e.setCancelled(true);
+            Processer processer = VProcessing.processConfiguration.locationCache.get(block.getLocation());
+            if(processer!=null)
+                p.openInventory(new ProcesserGUI(processer).gui());
+        }
+        // Hier steht eine Kategorie
+        else if(VProcessing.categoryConfiguration.locationCache.containsKey(block.getLocation())){
+            e.setCancelled(true);
+            Category category = VProcessing.categoryConfiguration.locationCache.get(block.getLocation());
+            if(category!=null)
+                p.openInventory(new CategoryGUI(category).gui());
+        }
     }
 
     @EventHandler
@@ -65,12 +74,13 @@ public class Listeners implements Listener {
             p.updateInventory();
 
             String identifier = GUI.getIdentifier(e.getClickedInventory());
-            ProcessConfiguration config = VProcessing.processConfiguration;
+
             PlayerSession session = PlayerSession.getSession(p);
 
             // Es handelt sich um einen Processer-Identifier!
 
             if(identifier.contains(ProcesserGUI.identifier)){
+                ProcessConfiguration config = VProcessing.processConfiguration;
                 identifier = identifier.replace(ProcesserGUI.identifier,"");
                 if(!config.exist(identifier))
                     throw new IllegalStateException("The given Processer: "+identifier+" does not exist somehow?");
@@ -126,6 +136,28 @@ public class Listeners implements Listener {
                         } catch (SQLException ex) {System.out.println("Error while trying to remove Task from Database!");ex.printStackTrace();}
                     }
                 }
+            }
+            else if(identifier.contains(CategoryGUI.identifier)){
+
+                CategoryConfiguration config = VProcessing.categoryConfiguration;
+                identifier = identifier.replace(CategoryGUI.identifier,"");
+
+                if(!config.exist(identifier))
+                    throw new IllegalStateException("The given Category: "+identifier+" does not exist somehow?");
+
+                Category category = config.categoryCache.get(identifier);
+                List<Processer> processerList = category.getProcesserList();
+                Optional<Processer> processer = processerList.stream().filter(proc -> {
+                   if(proc.getGuiIcon().equals(item)){
+                       p.openInventory(new ProcesserGUI(proc).gui());
+                       return true;
+                   }
+                   else if(proc.getGuiIcon().getType().equals(item.getType()) && proc.getGuiIcon().getAmount() == item.getAmount() && proc.getGuiIcon().getItemMeta().getDisplayName().equals(item.getItemMeta().getDisplayName())){
+                       p.openInventory(new ProcesserGUI(proc).gui());
+                       return true;
+                   }
+                   return false;
+                }).findFirst();
             }
         }
     }

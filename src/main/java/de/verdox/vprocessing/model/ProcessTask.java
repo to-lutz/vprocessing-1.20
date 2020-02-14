@@ -38,6 +38,19 @@ public class ProcessTask {
     public boolean isFinished(){
         return (System.currentTimeMillis() >= timestampStop);
     }
+    public float getTimeDifference(){
+        if(isFinished())
+            return 0;
+        return Math.abs((System.currentTimeMillis()-getTimestampStop())/1000);
+    }
+    public float getDuration(){
+        return (getTimestampStop()-getTimestampStarted())/1000;
+    }
+    public int getPercentage(){
+        if(isFinished())
+            return 100;
+        return (int) ((1-(getTimeDifference()/getDuration()))*100);
+    }
 
     @Override
     public String toString() {
