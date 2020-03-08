@@ -28,15 +28,24 @@ public class CategoryGUI extends GUI {
     public void setContent() {
         category = VProcessing.categoryConfiguration.categoryCache.get(ID);
         processerItemStackMap = new HashMap<>();
+        // Upper Border
         for(int i = 0;i<=9;i++)
-            gui().setItem(i,GUI.borderBlack());
+            gui().setItem(i,GUI.border());
+        // Under Border
         for(int i = gui().getSize()-9; i<= gui().getSize()-1;i++)
-            gui().setItem(i,GUI.borderBlack());
+            gui().setItem(i,GUI.border());
+        // Side Border right
+        for(int i = 1;i<gui().getSize();i+=8)
+            gui().setItem(i,GUI.border());
+
         for(Processer proc:category.getProcesserList()){
             ItemStack s = proc.getGuiIcon();
             int slot = gui().firstEmpty();
             gui().setItem(slot,s);
             processerItemStackMap.put(proc,slot);
+        }
+        while(gui().firstEmpty()!=-1){
+            gui().setItem(gui().firstEmpty(),GUI.emptySlot());
         }
     }
 

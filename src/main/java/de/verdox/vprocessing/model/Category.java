@@ -13,14 +13,16 @@ public class Category {
     private boolean useHologram;
     private boolean useLargeHologram;
     private List<Processer> processerList;
+    private List<String> description;
 
-    public Category(String categoryID,String name,Location loc,List<Processer> processerList,boolean useHologram,boolean useLargeHologram){
+    public Category(String categoryID,String name,Location loc,List<Processer> processerList,boolean useHologram,boolean useLargeHologram, List<String> description){
         this.categoryID = categoryID;
         this.name = name;
         this.location = loc;
         this.processerList = processerList;
         this.useHologram = useHologram;
         this.useLargeHologram = useLargeHologram;
+        this.description = description;
     }
 
     public Location getLocation() {
@@ -69,5 +71,9 @@ public class Category {
             VProcessing.consoleMessage("&4Categories can only have a maximum of 36 processers!");
             throw new IllegalStateException("Categories can only have a maximum of 36 processers!");
         }
+    }
+
+    public List<String> getDescription() {
+        return description;
     }
 }

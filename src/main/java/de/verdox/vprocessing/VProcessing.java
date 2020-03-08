@@ -1,5 +1,6 @@
 package de.verdox.vprocessing;
 
+import com.gmail.filoghost.holographicdisplays.api.HologramsAPI;
 import de.verdox.vprocessing.commands.AdminCommands;
 import de.verdox.vprocessing.configuration.*;
 import de.verdox.vprocessing.dataconnection.DataConnectionImpl;
@@ -22,15 +23,16 @@ import java.sql.SQLException;
 
 public class VProcessing extends JavaPlugin {
 
-    public static Plugin plugin;
+    public static VProcessing plugin;
     public static ProcessConfiguration processConfiguration;
     public static Messages messages;
     public static MySQLConfig mySQLConfig;
     public static Settings settings;
     public static CategoryConfiguration categoryConfiguration;
     public static DataConnectionImpl dataConnection;
-    private static int bStatsID = 6476;
-    private static int spigotID = 75112;
+    public static String newestVersion;
+    public static int bStatsID = 6476;
+    public static int spigotID = 75112;
     private static String PluginName = "V-Processing";
 
     @Override
@@ -71,6 +73,7 @@ public class VProcessing extends JavaPlugin {
         initBStats();
 
         new UpdateChecker(this, spigotID).getVersion(version -> {
+            newestVersion = version;
             if (this.getDescription().getVersion().equalsIgnoreCase(version)) {
                 consoleMessage("&aThere is no new Update available.");
             } else {
@@ -86,7 +89,8 @@ public class VProcessing extends JavaPlugin {
                     consoleMessage("&eThere is a new Update available. ");
                     consoleMessage("&eCurrent Version&7: &c"+this.getDescription().getVersion());
                     consoleMessage("&eLatest Version&7: &b"+version);
-                    consoleMessage("&eDownload at: &bhttps://www.spigotmc.org/resources/v-processing-create-processers-and-productioncycles-gui-based-1-13-x-1-15-x-mysql-sqlite.75112/");
+                    consoleMessage("&6Want to become a &epartner server&6? Tell me on Spigot!");
+                    consoleMessage("&eDownload at: &bhttp://bit.ly/2UWOD04");
                 }
             }
         });
@@ -98,9 +102,31 @@ public class VProcessing extends JavaPlugin {
         },100L, mySQLConfig.getPingTime()*20L);
     }
 
+    @Override
+    public void onDisable() {
+        try {
+            dataConnection.disconnect();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void reloadPlugin(){
+        HologramsAPI.getHolograms(VProcessing.plugin).stream().forEach(hologram -> hologram.delete());
+        settings = new Settings(VProcessing.plugin,"settings.yml","/settings");
+        if(!VProcessing.plugin.checkSoftDependency()){
+            VProcessing.plugin.setEnabled(false);
+            return;
+        }
+        messages = new Messages(VProcessing.plugin,"messages.yml","/settings");
+        mySQLConfig = new MySQLConfig(VProcessing.plugin,"MySQL.yml","/dataconnection");
+        processConfiguration = new ProcessConfiguration(VProcessing.plugin,"processer.yml","/ingame");
+        categoryConfiguration = new CategoryConfiguration(VProcessing.plugin,"categories.yml","/ingame");
+    }
+
     private void initBStats(){
         Metrics metrics = new Metrics(this, bStatsID);
-        metrics.addCustomChart(new Metrics.SingleLineChart("Processernumber", () -> processConfiguration.processerCache.keySet().size()));
+        metrics.addCustomChart(new Metrics.SimplePie("pluginVersion", () -> getDescription().getVersion()));
         consoleMessage("&bLoaded bStats successfully!");
     }
 
@@ -122,13 +148,14 @@ public class VProcessing extends JavaPlugin {
         }
     }
 
-    private void versionWhisper(Player p, String version){
+    public static void versionWhisper(Player p, String version){
         if(p.isOp() || p.hasPermission("vproc.admin")){
             p.sendMessage(ChatColor.translateAlternateColorCodes('&',"&8]======[&4V-Processing&8]======["));
             p.sendMessage(ChatColor.translateAlternateColorCodes('&',"&8|    &eThere is a new Update available. "));
-            p.sendMessage(ChatColor.translateAlternateColorCodes('&',"&8|    &bCurrent Version: &c"+this.getDescription().getVersion()));
+            p.sendMessage(ChatColor.translateAlternateColorCodes('&',"&8|    &bCurrent Version: &c"+VProcessing.plugin.getDescription().getVersion()));
             p.sendMessage(ChatColor.translateAlternateColorCodes('&',"&8|    &bLatest Version: &a"+version));
-            p.sendMessage(ChatColor.translateAlternateColorCodes('&',"&8|    &eDownload at: &bhttps://www.spigotmc.org/resources/v-processing-create-processers-and-productioncycles-gui-based-1-13-x-1-15-x-mysql-sqlite.75112/"));
+            p.sendMessage(ChatColor.translateAlternateColorCodes('&',"&8|    &6Want to become a &epartner server&6? Tell me on Spigot!"));
+            p.sendMessage(ChatColor.translateAlternateColorCodes('&',"&8|    &eDownload at: &bhttp://bit.ly/2UWOD04"));
             p.sendMessage("");
         }
     }
@@ -163,7 +190,6 @@ public class VProcessing extends JavaPlugin {
     }
 
     private synchronized void connectionCecker() throws SQLException, ClassNotFoundException {
-        consoleMessage("&7Checking Databaseconnection");
         if(dataConnection.isConnected())
             return;
         dataConnection.connect();

@@ -86,6 +86,13 @@ public class ProcesserGUI extends GUI {
                             inv.setItem(26,GUI.idleButton());
                             inv.setItem(35,GUI.idleButton());
 
+                            inv.setItem(20,GUI.idleButton());
+                            inv.setItem(21,GUI.idleButton());
+                            inv.setItem(22,GUI.idleButton());
+                            inv.setItem(23,GUI.idleButton());
+                            inv.setItem(24,GUI.idleButton());
+
+
                             // Inventory updates its layout!
                             if(percentage>=20)
                                 inv.setItem(20,GUI.percentage(20));
@@ -103,6 +110,12 @@ public class ProcesserGUI extends GUI {
                          }
                     }
                     else{
+
+                        inv.setItem(20,GUI.border());
+                        inv.setItem(21,GUI.border());
+                        inv.setItem(23,GUI.border());
+                        inv.setItem(24,GUI.border());
+
                         inv.setItem(22,GUI.process_Button(processer));
 
                         inv.setItem(9,GUI.process_Button(null));
@@ -112,11 +125,6 @@ public class ProcesserGUI extends GUI {
                         inv.setItem(17,GUI.process_Button(null));
                         inv.setItem(26,GUI.process_Button(null));
                         inv.setItem(35,GUI.process_Button(null));
-
-                        inv.setItem(20,null);
-                        inv.setItem(21,null);
-                        inv.setItem(23,null);
-                        inv.setItem(24,null);
 
                         inv.setItem(13,GUI.borderBlack());
                         inv.setItem(31,GUI.borderBlack());

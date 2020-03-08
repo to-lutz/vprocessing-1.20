@@ -1,6 +1,6 @@
 name: V-Processing
 main: de.verdox.vprocessing.VProcessing
-version: 1.1.4
+version: 1.2.5
 author: Verdox
 website: https://youtube.com/YourServerPromo
 database: true
@@ -9,4 +9,3 @@ softdepend: [HolographicDisplays]
 commands:
   vproc:
     permission: vproc.admin
-  processer:

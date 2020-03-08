@@ -29,10 +29,13 @@ public class AdminCommands implements CommandExecutor {
             }
             else if(args[0].equalsIgnoreCase("help")){
                 sender.sendMessage(ChatColor.translateAlternateColorCodes('&',"&8]======[&4V-Processing&8]======["));
-                sender.sendMessage(ChatColor.translateAlternateColorCodes('&',"&7/&evproc &8<&aprocesser&7/&acategory&8> &bgive &8- &6Gives you required Items for the processer&7!"));
+                sender.sendMessage(ChatColor.translateAlternateColorCodes('&',"&7/&evproc &8<&aprocesser&8> &bget &8- &6Gives you required Items for the processer&7!"));
                 sender.sendMessage(ChatColor.translateAlternateColorCodes('&',"&7/&evproc &8<&aprocesser&7/&acategory&8> &bset &8- &6Sets the position of the processer&7!"));
                 sender.sendMessage(ChatColor.translateAlternateColorCodes('&',"&7/&evproc &8<&aprocesser&7/&acategory&8> &bopen &8- &6Opens the Processer&7!"));
                 sender.sendMessage(ChatColor.translateAlternateColorCodes('&',"&7/&evproc &blist &8- &6Lists up all processers&7!"));
+            }
+            else if(args[0].equalsIgnoreCase("reload")){
+                VProcessing.reloadPlugin();
             }
         }
         else if(args.length == 2){
@@ -71,7 +74,7 @@ public class AdminCommands implements CommandExecutor {
 
                 if(ApiversionChecker.isLegacyVersion(VProcessing.plugin)){
                    Block block =  p.getTargetBlock(null,5);
-                   if(block == null){
+                   if(block == null || block.isEmpty()){
                        p.sendMessage(ErrorMessage.Look_At_Block.getMessage());
                        return false;
                    }

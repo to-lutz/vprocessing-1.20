@@ -6,7 +6,7 @@
 
     <groupId>de.verdox</groupId>
     <artifactId>V-processing</artifactId>
-    <version>1.1.4</version>
+    <version>1.2.5</version>
 
     <repositories>
         <repository>
@@ -59,7 +59,6 @@
                             <relocations>
                             <relocation>
                                 <pattern>org.bstats</pattern>
-                                <!-- Replace this with your package! -->
                                 <shadedPattern>de.verdox.vprocessing</shadedPattern>
                             </relocation>
                             </relocations>

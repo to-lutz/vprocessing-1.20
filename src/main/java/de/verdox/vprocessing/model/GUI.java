@@ -110,6 +110,19 @@ public abstract class GUI {
         stack.setItemMeta(meta);
         return stack;
     }
+    public static ItemStack emptySlot(){
+        ItemStack stack;
+        if(ApiversionChecker.isLegacyVersion(VProcessing.plugin)){
+            stack = new ItemStack(Material.getMaterial("STAINED_GLASS_PANE"),1,(byte) 8);
+        }
+        else{
+            stack = new ItemStack(Material.LIGHT_GRAY_STAINED_GLASS_PANE,1);
+        }
+        ItemMeta meta = stack.getItemMeta();
+        meta.setDisplayName(ChatColor.translateAlternateColorCodes('&',SuccessMessage.GUI_EMPTY.getMessage()));
+        stack.setItemMeta(meta);
+        return stack;
+    }
     public static ItemStack idleButton(){
         ItemStack stack;
         if(ApiversionChecker.isLegacyVersion(VProcessing.plugin)){

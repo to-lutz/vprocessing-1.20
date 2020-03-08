@@ -8,11 +8,14 @@ import de.verdox.vprocessing.configuration.messages.SuccessMessage;
 import de.verdox.vprocessing.dataconnection.PlayerSession;
 import de.verdox.vprocessing.model.*;
 import de.verdox.vprocessing.utils.InventoryHandler;
+import de.verdox.vprocessing.utils.UpdateChecker;
+import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -28,6 +31,12 @@ public class Listeners implements Listener {
     public void onPlayerJoin(PlayerJoinEvent e){
         Player p = e.getPlayer();
         PlayerSession.addToCache(p);
+
+        if(p.isOp()||p.hasPermission("vproc.admin")){
+            if(!VProcessing.plugin.getDescription().getVersion().equals(VProcessing.newestVersion)){
+                VProcessing.versionWhisper(p,VProcessing.newestVersion);
+            }
+        }
     }
 
     @EventHandler

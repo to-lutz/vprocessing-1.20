@@ -35,13 +35,19 @@ public class CategoryConfiguration extends Configuration{
 
         List<String> list = new ArrayList<>();
         list.add("processer_1");
+        List<String> description = new ArrayList<>();
+        description.add("&1First Line of GUI");
+        description.add("&6V-Processing");
+        description.add("&eMade by &4Verdox");
+        description.add("&cYoutube.com/YourServerPromo");
 
-        config.options().header("Config to setup processers, amounts etc...");
-        config.addDefault("Categories.category1.CategoryName","&aMühle");
-        config.addDefault("Categories.category1.UseHologram",true);
-        config.addDefault("Categories.category1.UseLargeHologram",true);
-        config.addDefault("Categories.category1.Processers",list);
-        config.addDefault("Categories.category1.Location","none");
+        config.options().header("Config to setup categories of processers");
+        config.addDefault("Categories.category_1.CategoryName","&aMill");
+        config.addDefault("Categories.category_1.Description",description);
+        config.addDefault("Categories.category_1.UseHologram",true);
+        config.addDefault("Categories.category_1.UseLargeHologram",true);
+        config.addDefault("Categories.category_1.Processers",list);
+        config.addDefault("Categories.category_1.Location","none");
 
         config.options().copyDefaults(true);
         save();
@@ -111,6 +117,11 @@ public class CategoryConfiguration extends Configuration{
         hologram.appendTextLine("");
         float lines = 2;
 
+        for(int i = 0;i<category.getDescription().size();i++){
+            hologram.appendTextLine(ChatColor.translateAlternateColorCodes('&',category.getDescription().get(i)));
+            lines++;
+        }
+
         int newY = (int) lines/2;
         Location fixedLoc = new Location(loc.getWorld(),loc.getX()+0.5,loc.getY()+newY+0.5,loc.getZ()+0.5);
         hologram.teleport(fixedLoc);
@@ -147,7 +158,8 @@ public class CategoryConfiguration extends Configuration{
             else
                 return null;
         }).filter(processer -> processer!=null).collect(Collectors.toList());
-        return new Category(categoryID,name,loc,processerList,useHologram,useLargeHologram);
+        List<String> description = section.getStringList("Description");
+        return new Category(categoryID,name,loc,processerList,useHologram,useLargeHologram,description);
     }
 
 

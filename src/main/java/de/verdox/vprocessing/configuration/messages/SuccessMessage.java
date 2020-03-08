@@ -22,6 +22,7 @@ public enum SuccessMessage {
     GUI_Cancel_Button("&4Click to cancel"),
     GUI_Ready("&6Ready to process!"),
     GUI_Finished("&aFinished processing!"),
+    GUI_EMPTY("&8Empty Slot"),
     Holograms_Duration("&eDuration: "),
     Holograms_NeededItems("&6Needed Items: "),
     Holograms_ProcessedItems("&6Reward Items: "),

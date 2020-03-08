@@ -40,6 +40,12 @@ public class HiddenStringUtils {
         return input.substring(0, start + SEQUENCE_HEADER.length()) + stringToColors(hiddenString) + input.substring(end, input.length());
     }
 
+    public static String removeHiddenString(String input){
+        if(!hasHiddenString(input))
+            return input;
+        return input.replace(encodeString(extractHiddenString(input)),"");
+    }
+
     /**
      * Internal stuff.
      */
