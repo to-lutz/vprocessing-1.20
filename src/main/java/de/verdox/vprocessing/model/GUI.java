@@ -73,8 +73,6 @@ public abstract class GUI {
         meta.getPersistentDataContainer().set(key, PersistentDataType.STRING, identifier);
         stack.setItemMeta(meta);
 
-        System.out.println(HiddenStringUtils.hasHiddenString(stack.getItemMeta().getDisplayName()));
-
         return stack;
     }
     public static ItemStack acceptButton(){
