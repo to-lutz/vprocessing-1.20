@@ -8,15 +8,23 @@ import de.verdox.vprocessing.utils.SecondsConverter;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public abstract class GUI {
+
+    private static final int IDENTIFIER_SLOT = 0;
+    private static final String GUI_IDENTIFIER = "vproc_gui_identifier";
+    private static final NamespacedKey key = new NamespacedKey(VProcessing.plugin, GUI_IDENTIFIER);
+
     protected Inventory inv;
     protected String identifier;
     protected String ID;
@@ -31,9 +39,9 @@ public abstract class GUI {
         for(int i = inv.getSize()-9;i<inv.getSize();i++){
             inv.setItem(i,border());
         }
+        inv.setItem(IDENTIFIER_SLOT,identifierStack());
         setContent();
         updateInventory();
-        inv.setItem(inv.getSize()-1,identifierStack());
     }
 
     protected BukkitRunnable runAsync(final Runnable runnable){
@@ -59,8 +67,14 @@ public abstract class GUI {
         }
 
         ItemMeta meta = stack.getItemMeta();
-        meta.setDisplayName(ChatColor.translateAlternateColorCodes('&',SuccessMessage.GUI_Border.getMessage()+HiddenStringUtils.encodeString(identifier)));
+        String name = ChatColor.translateAlternateColorCodes('&', SuccessMessage.GUI_Border.getMessage());
+        meta.setDisplayName(name);
+
+        meta.getPersistentDataContainer().set(key, PersistentDataType.STRING, identifier);
         stack.setItemMeta(meta);
+
+        System.out.println(HiddenStringUtils.hasHiddenString(stack.getItemMeta().getDisplayName()));
+
         return stack;
     }
     public static ItemStack acceptButton(){
@@ -212,7 +226,7 @@ public abstract class GUI {
     public static boolean hasIdentifier(Inventory inv){
         if(inv == null)
             return false;
-        ItemStack stack = inv.getItem(inv.getSize()-1);
+        ItemStack stack = inv.getItem(IDENTIFIER_SLOT);
         if(stack == null)
             return false;
         ItemMeta meta = stack.getItemMeta();
@@ -221,12 +235,12 @@ public abstract class GUI {
         String displayName = meta.getDisplayName();
         if(displayName == null)
             return false;
-        return HiddenStringUtils.hasHiddenString(displayName);
+        return meta.getPersistentDataContainer().get(key, PersistentDataType.STRING) != null;
     }
     public static String getIdentifier(Inventory inv){
         if(inv == null)
             return null;
-        ItemStack stack = inv.getItem(inv.getSize()-1);
+        ItemStack stack = inv.getItem(IDENTIFIER_SLOT);
         if(stack == null)
             return null;
         ItemMeta meta = stack.getItemMeta();
@@ -235,7 +249,7 @@ public abstract class GUI {
         String displayName = meta.getDisplayName();
         if(displayName == null)
             return null;
-        return HiddenStringUtils.extractHiddenString(displayName);
+        return meta.getPersistentDataContainer().get(key, PersistentDataType.STRING);
     }
     public Inventory gui(){return this.inv;}
 }

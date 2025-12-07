@@ -25,7 +25,7 @@ public class ProcessConfiguration extends Configuration{
 
     public Map<String,Processer> processerCache;
     public Map<Location, Processer> locationCache;
-    public Map<Processer,Hologram> hologramCache;
+    public Map<Processer, Hologram> hologramCache;
 
     public ProcessConfiguration(Plugin plugin,String fileName, String pluginDirectory){
         super(plugin,fileName,pluginDirectory);
@@ -55,7 +55,7 @@ public class ProcessConfiguration extends Configuration{
             hologramCache.get(processer).delete();
         }
         Location loc = processer.getLocation();
-        Hologram hologram = HologramsAPI.createHologram(VProcessing.plugin,loc);
+        Hologram hologram = HologramsAPI.createHologram(VProcessing.plugin, loc);
         hologram.appendTextLine(ChatColor.translateAlternateColorCodes('&',processer.getName()));
         hologram.appendTextLine("");
         hologram.appendTextLine(SuccessMessage.Holograms_Duration.getMessage()+processer.getDurationString());

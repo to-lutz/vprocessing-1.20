@@ -1,11 +1,11 @@
 name: V-Processing
 main: de.verdox.vprocessing.VProcessing
 version: 1.2.5
-author: Verdox
-website: https://youtube.com/YourServerPromo
+authors: [Verdox, to-lutz]
 database: true
-api-version: "1.13"
-softdepend: [HolographicDisplays]
+api-version: "1.20"
+depend:
+  - HolographicDisplays
 commands:
   vproc:
     permission: vproc.admin

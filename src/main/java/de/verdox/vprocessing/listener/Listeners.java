@@ -71,18 +71,25 @@ public class Listeners implements Listener {
 
     @EventHandler
     public void onInventoryClick(InventoryClickEvent e){
+        System.out.println("LOGGER: clicked inv");
         Player p = (Player) e.getWhoClicked();
         ItemStack item = e.getCurrentItem();
 
         if(item == null)
             return;
 
+        System.out.println("TOP: " + e.getView().getTopInventory().getType());
+        System.out.println("TITLE: " + e.getView().getTitle());
+        System.out.println("HOLDER: " + e.getView().getTopInventory().getHolder());
+        System.out.println("IDENT: " + GUI.getIdentifier(e.getView().getTopInventory()));
+
         // Es handelt sich um ein vom Plugin erstelltes GUI
-        if(GUI.hasIdentifier(e.getClickedInventory())){
+        if(GUI.hasIdentifier(e.getView().getTopInventory())){
+            System.out.println("Logger: clicked plugin gui inv");
             e.setCancelled(true);
             p.updateInventory();
 
-            String identifier = GUI.getIdentifier(e.getClickedInventory());
+            String identifier = GUI.getIdentifier(e.getView().getTopInventory());
 
             PlayerSession session = PlayerSession.getSession(p);
 

@@ -9,13 +9,6 @@ public class ApiversionChecker {
     }
     public static boolean isLegacyVersion(Plugin plugin){
         String version = getVersion(plugin);
-        if(version.startsWith("1.15"))
-            return false;
-        else if(version.startsWith("1.14"))
-            return false;
-        else if(version.startsWith("1.13"))
-            return false;
-        else
-            return true;
+        return !version.startsWith("1.20");
     }
 }

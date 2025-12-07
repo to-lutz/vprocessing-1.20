@@ -11,6 +11,7 @@ import de.verdox.vprocessing.listener.Listeners;
 import de.verdox.vprocessing.utils.ApiversionChecker;
 import de.verdox.vprocessing.utils.UpdateChecker;
 import org.bstats.bukkit.Metrics;
+import org.bstats.charts.SimplePie;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -37,11 +38,9 @@ public class VProcessing extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        if(ApiversionChecker.isLegacyVersion(this))
-            consoleMessage("&eFound Spigot Legacy Version&7: < &b1.13");
-        else
-            consoleMessage("&eFound new Spigot Version&7: > &b1.12");
         plugin = this;
+
+        consoleMessage("§aVProcessing heavily modified by @to-lutz");
 
         settings = new Settings(this,"settings.yml","/settings");
         if(!checkSoftDependency()){
@@ -71,29 +70,6 @@ public class VProcessing extends JavaPlugin {
         Bukkit.getOnlinePlayers().stream().forEach(player -> PlayerSession.getSession(player));
 
         initBStats();
-
-        new UpdateChecker(this, spigotID).getVersion(version -> {
-            newestVersion = version;
-            if (this.getDescription().getVersion().equalsIgnoreCase(version)) {
-                consoleMessage("&aThere is no new Update available.");
-            } else {
-                if(settings.useUpdateChecker()){
-                    new BukkitRunnable() {
-                        @Override
-                        public void run() {
-                            Bukkit.getOnlinePlayers().stream().forEach(player -> {
-                                versionWhisper(player,version);
-                            });
-                        }
-                    }.runTaskTimerAsynchronously(this,0L,300L*20);
-                    consoleMessage("&eThere is a new Update available. ");
-                    consoleMessage("&eCurrent Version&7: &c"+this.getDescription().getVersion());
-                    consoleMessage("&eLatest Version&7: &b"+version);
-                    consoleMessage("&6Want to become a &epartner server&6? Tell me on Spigot!");
-                    consoleMessage("&eDownload at: &bhttp://bit.ly/2UWOD04");
-                }
-            }
-        });
 
         VProcessing.consoleMessage("&aPlugin loaded successfully!");
 
@@ -126,7 +102,7 @@ public class VProcessing extends JavaPlugin {
 
     private void initBStats(){
         Metrics metrics = new Metrics(this, bStatsID);
-        metrics.addCustomChart(new Metrics.SimplePie("pluginVersion", () -> getDescription().getVersion()));
+        metrics.addCustomChart(new SimplePie("pluginVersion", () -> getDescription().getVersion()));
         consoleMessage("&bLoaded bStats successfully!");
     }
 
@@ -179,10 +155,10 @@ public class VProcessing extends JavaPlugin {
         }
         String holoVersion = Bukkit.getPluginManager().getPlugin("HolographicDisplays").getDescription().getVersion();
         consoleMessage("&eFound HolographicDisplays with Version&7: &b"+holoVersion);
-        if(!holoVersion.startsWith("2.4"))
+        if(!holoVersion.startsWith("3.0"))
         {
             consoleMessage("&eBut you picked the wrong version&7: &6"+ Bukkit.getPluginManager().getPlugin("HolographicDisplays").getDescription().getVersion());
-            consoleMessage("&cYou need at least the Version&7: &a2.4.0");
+            consoleMessage("&cYou need at least the Version&7: &a3.0");
             consoleMessage("&cThe Plugin will now shutdown!");
             return false;
         }
